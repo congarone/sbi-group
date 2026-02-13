@@ -225,13 +225,14 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
-app.listen(PORT, () => {
-  console.log(`SBI Group server: http://localhost:${PORT}`);
+app.listen(Number(PORT), '0.0.0.0', () => {
+  console.log(`SBI Group server: http://0.0.0.0:${PORT}`);
 });
 
-// Automatsko preuzimanje jučerašnjeg prometa svaki dan u 7:00
+// Automatsko preuzimanje jučerašnjeg prometa svaki dan u 7:00 (preskoči na Renderu — Puppeteer ne radi na free tier)
 let lastFetchDate = null;
 function runScheduledRetailFetch() {
+  if (process.env.RENDER) return; // Render free tier nema Puppeteer
   const now = new Date();
   if (now.getHours() !== 7 || now.getMinutes() > 1) return;
   const today = now.toISOString().slice(0, 10);
