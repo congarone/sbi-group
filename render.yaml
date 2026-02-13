@@ -1,0 +1,7 @@
+# Render — ako kreiraš novi servis iz repoa, koristi ove postavke
+services:
+  - type: web
+    name: sbi-group
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server.js
