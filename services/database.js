@@ -1,10 +1,15 @@
 /**
  * Database adapter: SQLite (lokalno) ili Supabase (cloud).
  * Ako su SUPABASE_URL i SUPABASE_SERVICE_KEY postavljeni, koristi Supabase.
- * Inače koristi SQLite.
+ * Na Renderu MORA Supabase (SQLite ne radi). Inače koristi SQLite.
  */
 
 const useSupabase = !!(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY);
+
+if (process.env.RENDER && !useSupabase) {
+  console.error('[DB] Na Renderu moraš postaviti SUPABASE_URL i SUPABASE_SERVICE_KEY u Environment.');
+  process.exit(1);
+}
 
 let impl;
 if (useSupabase) {
