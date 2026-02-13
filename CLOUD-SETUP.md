@@ -35,13 +35,28 @@ Ako već imaš podatke u lokalnoj SQLite bazi:
 
 1. Pokreni migraciju (skripta za kopiranje SQLite → Supabase):
    ```bash
-   # TODO: node scripts/migrate-to-supabase.js
+   node scripts/migrate-to-supabase.js
    ```
    Ili ručno: exportuj podatke iz SQLite i importuj u Supabase preko SQL Editor.
 
 2. Za retail podatke: preuzmi Excel-e i pokreni `node scripts/retail-parse-by-brand.js` na cloudu (ili lokalno sa SUPABASE_URL postavljenim).
 
-## 4. Lokalno testiranje sa Supabase
+## 4. Automatsko preuzimanje retail prometa (GitHub Actions)
+
+Svaki dan u 7:00 aplikacija može sama preuzeti promet sa retail portala i upisati u Supabase.
+
+1. U GitHub repou otvori **Settings → Secrets and variables → Actions**
+2. Dodaj **Repository secrets**:
+   - `SUPABASE_URL` — Project URL iz Supabase
+   - `SUPABASE_SERVICE_KEY` — service_role key
+   - `RETAIL_USERNAME` — email za login na retail portal
+   - `RETAIL_PASSWORD` — lozinka za retail portal
+
+3. Push kod na GitHub — workflow `.github/workflows/retail-daily-fetch.yml` će se pokretati svaki dan u 7:00
+4. Ručno pokretanje: **Actions** tab → **Retail dnevni promet** → **Run workflow**
+
+## 5. Lokalno testiranje sa Supabase
+
 
 Da bi lokalno koristio Supabase umjesto SQLite:
 
@@ -60,6 +75,8 @@ node server.js
 
 ## Napomene
 
+- **SUPABASE_URL i SUPABASE_SERVICE_KEY** — obavezni na Renderu. Bez njih aplikacija neće startovati.
+- **db.mapping.json** — opciono na Renderu. Ako nemaš SQL Server u cloud-u, dnevni promet iz SQL-a i "Artikli u padu" će biti prazni. Retail promet koristi Supabase.
 - **retail.source.json** — korisnik i šifra za retail portal ostaju na serveru. Na Renderu možeš dodati kao env varijable ako želiš.
-- **Puppeteer** — automatsko preuzimanje retail Excel-a koristi Puppeteer. Na Render free tier to može biti ograničeno (nema headless browser). Možeš ručno preuzimati Excel-e i parsirati ih.
-- **Besplatni tier** — Render free instance "spava" nakon 15 min neaktivnosti. Prvi request može trajati 30–60 sekundi.
+- **Puppeteer** — automatsko preuzimanje retail Excel-a koristi Puppeteer. Na Render free tier to ne radi. Koristi **GitHub Actions** (v. sekcija 4) da se promet preuzima svaki dan i upisuje u Supabase.
+- **Besplatni tier** — Render free instance "spava" nakon 15 min neaktivnosti. Prvi request može trajati 30–60 sekundi. Sačekaj ili osvježi stranicu.

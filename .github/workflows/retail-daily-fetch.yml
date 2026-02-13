@@ -1,0 +1,29 @@
+# Svaki dan u 7:00 preuzima retail promet sa portala i upisuje u Supabase.
+# Repo mora imati Secrets: SUPABASE_URL, SUPABASE_SERVICE_KEY, RETAIL_USERNAME, RETAIL_PASSWORD
+name: Retail dnevni promet
+
+on:
+  schedule:
+    - cron: '0 6 * * *'   # 7:00 CET (6:00 UTC)
+  workflow_dispatch:       # Ručno pokretanje iz GitHub Actions taba
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Preuzmi retail i upiši u Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          RETAIL_USERNAME: ${{ secrets.RETAIL_USERNAME }}
+          RETAIL_PASSWORD: ${{ secrets.RETAIL_PASSWORD }}
+        run: node scripts/retail-fetch-and-sync.js
