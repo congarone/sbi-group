@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SBI Group — Akcije i promet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --sf-blue: #0176d3;
+      --sf-blue-hover: #014486;
+      --sf-blue-light: #eef4ff;
+      --sf-bg: #f3f3f3;
+      --sf-surface: #ffffff;
+      --sf-border: #dddbda;
+      --sf-text: #181818;
+      --sf-text-soft: #706e6b;
+      --sf-success: #2e844a;
+      --sf-success-bg: #cdefc4;
+      --sf-warning: #fe9339;
+      --sf-warning-bg: #fef3e2;
+      --sf-danger: #ea001e;
+      --sf-danger-bg: #fef1f2;
+      --sf-sidebar: #16325c;
+      --sf-sidebar-hover: #0d223f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--sf-bg);
+      color: var(--sf-text);
+      margin: 0;
+      padding: 0;
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .app-shell { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 260px;
+      background: var(--sf-sidebar);
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .sidebar-brand { padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .sidebar-brand h1 { font-size: 1.25rem; font-weight: 700; margin: 0; color: #fff; }
+    .sidebar-brand p { font-size: 0.75rem; color: rgba(255,255,255,0.7); margin: 4px 0 0 0; }
+    .sidebar-nav { padding: 16px 0; }
+    .sidebar-nav a {
+      display: block;
+      padding: 10px 24px;
+      color: rgba(255,255,255,0.85);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: background 0.15s;
+    }
+    .sidebar-nav a:hover { background: var(--sf-sidebar-hover); color: #fff; }
+    .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .top-bar {
+      background: var(--sf-surface);
+      border-bottom: 1px solid var(--sf-border);
+      padding: 12px 24px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+    .top-bar h2 { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--sf-text); }
+    .container { flex: 1; padding: 24px; max-width: 1200px; width: 100%; margin: 0 auto; }
+    .card {
+      background: var(--sf-surface);
+      border: 1px solid var(--sf-border);
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--sf-text);
+      margin: 0 0 6px 0;
+    }
+    .card-subtitle { font-size: 0.875rem; color: var(--sf-text-soft); margin: 0 0 16px 0; }
+    .step-badge {
+      display: inline-block;
+      background: var(--sf-blue);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-right: 8px;
+    }
+    .status-line { font-size: 0.875rem; margin-bottom: 8px; color: var(--sf-text-soft); }
+    .status-line.ok { color: var(--sf-success); font-weight: 600; }
+    .status-line.err { color: var(--sf-danger); }
+    .message { padding: 12px 16px; border-radius: 4px; margin-top: 12px; font-size: 0.875rem; }
+    .message.success { background: var(--sf-success-bg); color: #1b5e20; }
+    .message.error { background: var(--sf-danger-bg); color: #b71c1c; }
+    .message.info { background: var(--sf-blue-light); color: var(--sf-blue-hover); }
+
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
+    button {
+      font-family: inherit;
+      font-size: 0.875rem;
+      padding: 10px 20px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    button:active { transform: scale(0.98); }
+    button.primary {
+      background: var(--sf-blue);
+      color: white;
+    }
+    button.primary:hover { background: var(--sf-blue-hover); }
+    button.secondary {
+      background: var(--sf-surface);
+      color: var(--sf-text);
+      border: 1px solid var(--sf-border);
+    }
+    button.secondary:hover { border-color: var(--sf-blue); color: var(--sf-blue); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .file-input-wrap { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    input[type="file"] { font-size: 0.875rem; padding: 6px 0; }
+    input[type="text"], input[type="number"], input[type="password"] {
+      border: 1px solid var(--sf-border);
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 0.875rem;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--sf-border); }
+    th { color: var(--sf-text-soft); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    tbody tr:hover { background: var(--sf-blue-light); }
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+    .badge-high { background: var(--sf-success-bg); color: var(--sf-success); }
+    .badge-extreme { background: var(--sf-danger-bg); color: var(--sf-danger); }
+    .badge-medium { background: var(--sf-warning-bg); color: var(--sf-warning); }
+    .badge-low { background: #f3f3f3; color: var(--sf-text-soft); }
+    .empty-state { color: var(--sf-text-soft); padding: 24px 0; text-align: center; font-size: 0.875rem; }
+    a { color: var(--sf-blue); font-weight: 600; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .section-table { max-height: 320px; overflow: auto; }
+    .sql-wizard label { display: block; margin-top: 12px; margin-bottom: 4px; font-weight: 600; font-size: 0.875rem; }
+    .sql-wizard input, .sql-wizard select { width: 100%; max-width: 320px; padding: 8px 12px; font-size: 0.875rem; border: 1px solid var(--sf-border); border-radius: 4px; }
+    .sql-wizard .row { margin-top: 16px; }
+    .sql-wizard select { cursor: pointer; }
+    .sql-help { font-size: 0.8rem; color: var(--sf-text-soft); margin-top: 6px; }
+    .retail-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 8px; }
+    @media (max-width: 560px) { .retail-stats { grid-template-columns: 1fr; } }
+    .retail-stat-box {
+      background: var(--sf-blue-light);
+      border: 1px solid #c9d9fd;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+    }
+    .retail-stat-label { font-size: 0.75rem; color: var(--sf-text-soft); font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .retail-stat-value { font-size: 1.75rem; font-weight: 700; color: var(--sf-text); }
+    .retail-stat-meta { font-size: 0.8rem; color: var(--sf-text-soft); margin-top: 4px; }
+    .chart-container { position: relative; height: 280px; margin-bottom: 16px; }
+    .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 768px) { .charts-row { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .sidebar { width: 200px; } .sidebar-brand h1 { font-size: 1rem; } }
+  </style>
+</head>
+<body>
+  <div id="wrong-url-message" style="display:none; position:fixed; inset:0; background:#16325c; color:#fff; z-index:9999; font-family: system-ui, sans-serif; min-height:100vh; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:40px; box-sizing:border-box;">
+    <p style="font-size:1.5rem; font-weight:700; margin-bottom:8px;">SBI Group</p>
+    <p style="font-size:1rem; margin-bottom:24px; color:rgba(255,255,255,0.8);">Aplikacija mora da se otvori preko servera.</p>
+    <p style="font-size:0.95rem; margin-bottom:20px; color:rgba(255,255,255,0.7);">Dupli klik na <strong>SBI Group.bat</strong> u folderu aplikacije</p>
+    <a href="http://localhost:3000" style="font-size:1.2rem; color:#0176d3; font-weight:600;">http://localhost:3000</a>
+    <p style="margin-top:24px; font-size:0.875rem; color:rgba(255,255,255,0.6);">Ako server nije pokrenut, prvo pokreni SBI Group.bat</p>
+  </div>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h1>SBI Group</h1>
+        <p>Sales Cloud</p>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#promet"><span>Promet</span></a>
+        <a href="#grafikon"><span>Grafikon</span></a>
+        <a href="#chat"><span>Chatbot</span></a>
+        <a href="#priprema"><span>Priprema</span></a>
+        <a href="#preporuke"><span>Preporuke</span></a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="top-bar">
+        <h2>Pregled</h2>
+      </header>
+      <main class="container">
+    <!-- Promet — Jučerašnji i cijeli mjesec -->
+    <section class="card retail-promo-card" id="promet">
+      <h2 class="card-title">Promet</h2>
+      <p class="card-subtitle" style="margin-bottom:20px">Automatski se preuzima svaki dan u 7:00 ujutro.</p>
+      <div class="retail-stats">
+        <div class="retail-stat-box">
+          <div class="retail-stat-label" id="retail-yesterday-label">Jučerašnji promet</div>
+          <div class="retail-stat-value" id="retail-yesterday">—</div>
+          <div class="retail-stat-meta" id="retail-yesterday-date"></div>
+        </div>
+        <div class="retail-stat-box">
+          <div class="retail-stat-label">Cijeli mjesec</div>
+          <div class="retail-stat-value" id="retail-month-total">—</div>
+          <div class="retail-stat-meta" id="retail-month-days"></div>
+        </div>
+      </div>
+      <div id="retail-msg" class="message" style="display:none; margin-top:12px"></div>
+    </section>
+
+    <!-- Chatbot za dogovor oko akcija -->
+    <section class="card" id="chat">
+      <h2 class="card-title">💬 Chatbot — dogovor oko akcija</h2>
+      <p class="card-subtitle">Pitaj za preporuke, promet ili pomoć. Npr. "šta preporučuješ", "koliki je promet", "pomoć".</p>
+      <div id="chat-messages" style="max-height:280px; overflow-y:auto; background:var(--sf-blue-light); border-radius:4px; padding:16px; margin-bottom:12px; min-height:120px; border:1px solid var(--sf-border);">
+        <div class="chat-msg bot" style="margin-bottom:10px;"><strong>Bot:</strong> Zdravo! Piši poruku da počnemo.</div>
+      </div>
+      <div class="file-input-wrap" style="align-items:stretch;">
+        <input type="text" id="chat-input" placeholder="Npr. šta preporučuješ?" style="flex:1; padding:10px 14px; font-size:0.9rem; border:1px solid var(--sf-border); border-radius:4px;" />
+        <button type="button" id="btn-chat-send" class="primary">Pošalji</button>
+      </div>
+    </section>
+
+    <!-- Korak 1: Priprema -->
+    <section class="card" id="priprema">
+      <h2 class="card-title"><span class="step-badge">1</span> Priprema podataka</h2>
+      <p class="card-subtitle">Uvezi istoriju akcija iz foldera, zatim pokreni učenje.</p>
+      <div id="status-db" class="status-line">Čekam server…</div>
+      <div id="status-events" class="status-line">Uvezeno akcija: …</div>
+      <div id="msg-prep" class="message" style="display:none;"></div>
+      <div class="actions">
+        <button type="button" id="btn-import-history" class="primary">Uvezi istoriju akcija</button>
+        <button type="button" id="btn-run-learning" class="secondary">Pokreni učenje</button>
+      </div>
+    </section>
+
+    <!-- Dnevni promet — grafik -->
+    <section class="card" id="grafikon">
+      <h2 class="card-title"><span class="step-badge">2</span> Promet po danima</h2>
+      <p class="card-subtitle" id="turnover-chart-subtitle">Dnevni promet (ovaj mjesec).</p>
+      <div class="chart-container">
+        <canvas id="turnover-chart"></canvas>
+      </div>
+      <div id="turnover-chart-empty" class="empty-state" style="display:none;">Nema podataka. Preuzmi retail promet.</div>
+    </section>
+    <section class="card">
+      <h2 class="card-title">Artikli u padu</h2>
+      <div class="section-table" id="declines-list">
+        <div class="empty-state">Učitavam…</div>
+      </div>
+    </section>
+
+    <!-- Promet po brendu i regiji — pie charts -->
+    <section class="card">
+      <h2 class="card-title">Promet po brendu i regiji</h2>
+      <p class="card-subtitle" id="pie-chart-subtitle">Pie chart raspodjela (ovaj mjesec).</p>
+      <div id="promet-mjesec-line" style="font-size:1.1rem; font-weight:600; margin-bottom:16px; color:var(--sf-blue);">Promet ovog mjeseca: —</div>
+      <div class="charts-row">
+        <div>
+          <h3 style="font-size:0.95rem; margin:0 0 8px 0; color:var(--sf-text-soft);">Po brendu</h3>
+          <div class="chart-container" style="height:260px;">
+            <canvas id="brand-pie-chart"></canvas>
+          </div>
+          <div id="brand-pie-empty" class="empty-state" style="display:none;">Nema podataka po brendu.</div>
+        </div>
+        <div>
+          <h3 style="font-size:0.95rem; margin:0 0 8px 0; color:var(--sf-text-soft);">Po regiji</h3>
+          <div class="chart-container" style="height:260px;">
+            <canvas id="region-pie-chart"></canvas>
+          </div>
+          <div id="region-pie-empty" class="empty-state" style="display:none;">Nema podataka po regiji.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Preporuke -->
+    <section class="card" id="preporuke">
+      <h2 class="card-title"><span class="step-badge">3</span> Preporučene akcije</h2>
+      <p class="card-subtitle">Lista predloženih akcija (rabat, trajanje, očekivani učinak).</p>
+      <div class="section-table" id="recommendations-list">
+        <div class="empty-state">Učitavam…</div>
+      </div>
+    </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    var RUN_APP = window.location.protocol !== 'file:';
+    if (!RUN_APP) {
+      document.getElementById('wrong-url-message').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+    const API = RUN_APP ? (window.location.origin + '/api') : '';
+
+    function showMsg(id, text, type) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = text;
+      el.className = 'message ' + (type || 'info');
+      el.style.display = 'block';
+      if (type === 'success' || type === 'error') setTimeout(() => { el.style.display = 'none'; }, 6000);
+    }
+
+    var SERVER_MSG = 'Pokreni SBI Group.bat (dupli klik), pa u browseru otvori http://localhost:3000. Ako se greška ponovi, sačekaj 5 sekundi i pritisni F5.';
+    async function fetchJson(url, options = {}, retry = true) {
+      if (!API) {
+        throw new Error('Aplikaciju otvori preko http://localhost:3000 (pokreni SBI Group.bat). Ne otvaraj index.html duplim klikom.');
+      }
+      let r, text;
+      try {
+        r = await fetch(API + url, options);
+        text = await r.text();
+      } catch (e) {
+        if (retry) {
+          await new Promise(function (resolve) { setTimeout(resolve, 2500); });
+          return fetchJson(url, options, false);
+        }
+        throw new Error((e && e.message) || 'Server nije dostupan. ' + SERVER_MSG);
+      }
+      const isJson = (r.headers.get('content-type') || '').includes('application/json') || /^\s*[\{\[]/.test(text);
+      if (!isJson) {
+        if (retry) {
+          await new Promise(function (resolve) { setTimeout(resolve, 2500); });
+          return fetchJson(url, options, false);
+        }
+        console.error('Server vratio nije JSON:', text.slice(0, 200));
+        throw new Error('Server nije vratio podatke. ' + SERVER_MSG);
+      }
+      const data = JSON.parse(text);
+      if (!r.ok) throw new Error(data.error || r.statusText);
+      return data;
+    }
+
+    async function loadStatus() {
+      try {
+        const [mapRes, eventsRes] = await Promise.all([
+          fetchJson('/db-mapping-status'),
+          fetchJson('/promo-events-count')
+        ]);
+        const dbEl = document.getElementById('status-db');
+        dbEl.textContent = mapRes.configured
+          ? 'Baza podataka: povezana (db.mapping.json)'
+          : 'Baza podataka: nije podešena. Dnevni promet neće raditi dok ne podesiš db.mapping.json.';
+        dbEl.className = 'status-line ' + (mapRes.configured ? 'ok' : '');
+        document.getElementById('status-events').textContent = 'Uvezeno akcija (2025): ' + (eventsRes.count || 0);
+      } catch (e) {
+        document.getElementById('status-db').textContent = 'Greška: ' + e.message;
+        document.getElementById('status-db').className = 'status-line err';
+      }
+    }
+
+    let turnoverChartInstance = null;
+    async function loadTurnover() {
+      const canvas = document.getElementById('turnover-chart');
+      const emptyEl = document.getElementById('turnover-chart-empty');
+      const subtitleEl = document.getElementById('turnover-chart-subtitle');
+      try {
+        let data = [];
+        let source = '';
+        try {
+          const retail = await fetchJson('/retail-analysis');
+          if (retail.ok && retail.data && retail.data.length > 0) {
+            data = retail.data;
+            const summaryRes = await fetchJson('/retail-turnover-summary');
+            const total = summaryRes.ok ? (summaryRes.thisMonthTotal || 0) : 0;
+            const mjesec = new Date().toLocaleDateString('sr-RS', { month: 'long', year: 'numeric' });
+            source = 'Retail (' + mjesec + '): ' + (total > 0 ? total.toLocaleString('sr-RS', { minimumFractionDigits: 2 }) + ' € ukupno, ' : '') + (retail.dayCount || 0) + ' dana.';
+          }
+        } catch (_) {}
+        if (data.length === 0) {
+          const sqlRes = await fetchJson('/daily-turnover');
+          data = sqlRes.data || [];
+          source = 'SQL';
+        }
+        if (!data || data.length === 0) {
+          emptyEl.style.display = 'block';
+          canvas.style.display = 'none';
+          if (subtitleEl) subtitleEl.textContent = '';
+          return;
+        }
+        emptyEl.style.display = 'none';
+        canvas.style.display = 'block';
+        if (subtitleEl) subtitleEl.textContent = source;
+        const last = data;
+        if (turnoverChartInstance) turnoverChartInstance.destroy();
+        turnoverChartInstance = new Chart(canvas, {
+          type: 'bar',
+          data: {
+            labels: last.map(r => r.date),
+            datasets: [{
+              label: 'Iznos (€)',
+              data: last.map(r => r.amount || 0),
+              backgroundColor: 'rgba(1, 118, 211, 0.6)',
+              borderColor: '#0176d3',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString('sr-RS') + ' €' } },
+              x: { ticks: { maxRotation: 45, fontSize: 10 } }
+            }
+          }
+        });
+      } catch (e) {
+        emptyEl.style.display = 'block';
+        emptyEl.textContent = 'Greška: ' + e.message;
+        canvas.style.display = 'none';
+      }
+    }
+
+    async function loadDeclines() {
+      const el = document.getElementById('declines-list');
+      try {
+        const { data } = await fetchJson('/top-declines');
+        if (!data || data.length === 0) {
+          el.innerHTML = '<div class="empty-state">Nema podataka o padovima ili nema padova.</div>';
+          return;
+        }
+        el.innerHTML = '<table><tr><th>Šifra</th><th>Promjena %</th><th>Prosjek (1. pol)</th><th>Prosjek (2. pol)</th></tr>' +
+          data.slice(0, 15).map(r => '<tr><td>' + r.articleCode + '</td><td>' + (r.changePercent * 100).toFixed(1) + '%</td><td>' + Number(r.avgFirst).toFixed(1) + '</td><td>' + Number(r.avgSecond).toFixed(1) + '</td></tr>').join('') + '</table>';
+      } catch (e) {
+        el.innerHTML = '<div class="empty-state">Greška: ' + e.message + '</div>';
+      }
+    }
+
+    async function loadRecommendations() {
+      const el = document.getElementById('recommendations-list');
+      try {
+        const { data } = await fetchJson('/recommendations');
+        if (!data || data.length === 0) {
+          el.innerHTML = '<div class="empty-state">Nema preporuka. Uvezi istoriju akcija i pokreni učenje.</div>';
+          return;
+        }
+        const badge = (c) => {
+          const cls = c === 'EXTREME' ? 'extreme' : c === 'HIGH' ? 'high' : c === 'MEDIUM' ? 'medium' : 'low';
+          return '<span class="badge badge-' + cls + '">' + c + '</span>';
+        };
+        el.innerHTML = '<table><tr><th>Artikal</th><th>Tip</th><th>Rabat %</th><th>Trajanje</th><th>Očekivani uplift</th><th>Dodatni promet</th></tr>' +
+          data.slice(0, 50).map(r => '<tr><td>' + (r.articleName || r.articleCode).slice(0, 45) + '</td><td>' + badge(r.elasticityClass) + '</td><td>' + r.suggestedDiscountPercent + '%</td><td>' + r.suggestedDays + ' d</td><td>' + Number(r.expectedUplift).toFixed(2) + '</td><td>' + Number(r.expectedAdditionalRevenue || 0).toFixed(2) + '</td></tr>').join('') + '</table>';
+      } catch (e) {
+        el.innerHTML = '<div class="empty-state">Greška: ' + e.message + '</div>';
+      }
+    }
+
+    const PIE_COLORS = ['#0176d3','#2e844a','#fe9339','#706e6b','#1589ee','#3ba755','#ff9a3c','#7f8c8d','#4a90d9','#5cb85c'];
+    let brandPieInstance = null, regionPieInstance = null;
+    function renderPieChart(canvasId, emptyId, data, labelKey, valueKey) {
+      const canvas = document.getElementById(canvasId);
+      const emptyEl = document.getElementById(emptyId);
+      if (!data || data.length === 0) {
+        emptyEl.style.display = 'block';
+        canvas.style.display = 'none';
+        if (canvasId === 'brand-pie-chart' && brandPieInstance) { brandPieInstance.destroy(); brandPieInstance = null; }
+        if (canvasId === 'region-pie-chart' && regionPieInstance) { regionPieInstance.destroy(); regionPieInstance = null; }
+        return;
+      }
+      emptyEl.style.display = 'none';
+      canvas.style.display = 'block';
+      const inst = canvasId === 'brand-pie-chart' ? brandPieInstance : regionPieInstance;
+      if (inst) inst.destroy();
+      const chart = new Chart(canvas, {
+        type: 'pie',
+        data: {
+          labels: data.map(r => r[labelKey] || '—'),
+          datasets: [{
+            data: data.map(r => r[valueKey] || 0),
+            backgroundColor: data.map((_, i) => PIE_COLORS[i % PIE_COLORS.length]),
+            borderWidth: 1,
+            borderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'right' },
+            tooltip: { callbacks: { label: ctx => ctx.label + ': ' + (ctx.raw || 0).toLocaleString('sr-RS') + ' € (' + (ctx.percent || 0).toFixed(1) + '%)' } }
+          }
+        }
+      });
+      if (canvasId === 'brand-pie-chart') brandPieInstance = chart;
+      else regionPieInstance = chart;
+    }
+    async function loadBrandAnalysis() {
+      try {
+        const res = await fetchJson('/retail-analysis-by-brand');
+        if (res.ok && res.data && res.data.length > 0) {
+          renderPieChart('brand-pie-chart', 'brand-pie-empty', res.data, 'brand', 'totalAmount');
+        } else {
+          renderPieChart('brand-pie-chart', 'brand-pie-empty', [], 'brand', 'totalAmount');
+        }
+      } catch (e) {
+        renderPieChart('brand-pie-chart', 'brand-pie-empty', [], 'brand', 'totalAmount');
+      }
+    }
+    async function loadRegionAnalysis() {
+      try {
+        const res = await fetchJson('/retail-analysis-by-region');
+        if (res.ok && res.data && res.data.length > 0) {
+          renderPieChart('region-pie-chart', 'region-pie-empty', res.data, 'region', 'totalAmount');
+        } else {
+          renderPieChart('region-pie-chart', 'region-pie-empty', [], 'region', 'totalAmount');
+        }
+      } catch (e) {
+        renderPieChart('region-pie-chart', 'region-pie-empty', [], 'region', 'totalAmount');
+      }
+    }
+
+    document.getElementById('btn-import-history').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-import-history');
+      const msg = document.getElementById('msg-prep');
+      btn.disabled = true;
+      msg.style.display = 'none';
+      try {
+        const res = await fetchJson('/import-promo-history', { method: 'POST' });
+        showMsg('msg-prep', 'Uvezeno ' + res.imported + ' akcija.' + (res.errors?.length ? ' Upozorenja: ' + res.errors.length : ''), 'success');
+        loadStatus();
+      } catch (e) {
+        showMsg('msg-prep', 'Greška: ' + e.message, 'error');
+      }
+      btn.disabled = false;
+    });
+
+    document.getElementById('btn-run-learning').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-run-learning');
+      const msg = document.getElementById('msg-prep');
+      btn.disabled = true;
+      msg.style.display = 'none';
+      try {
+        const res = await fetchJson('/run-elasticity-learning', { method: 'POST' });
+        showMsg('msg-prep', 'Učenje završeno. Profila: ' + res.profilesCount + '.', 'success');
+        loadRecommendations();
+      } catch (e) {
+        showMsg('msg-prep', 'Greška: ' + e.message, 'error');
+      }
+      btn.disabled = false;
+    });
+
+    async function loadRetailSummary() {
+      const yesterdayEl = document.getElementById('retail-yesterday');
+      const yesterdayDateEl = document.getElementById('retail-yesterday-date');
+      const monthEl = document.getElementById('retail-month-total');
+      const daysEl = document.getElementById('retail-month-days');
+      if (!yesterdayEl || !monthEl) return;
+      try {
+        const res = await fetchJson('/retail-turnover-summary');
+        if (res.ok) {
+          const yesterday = res.yesterdayAmount ?? 0;
+          const lastRecorded = res.lastRecordedAmount ?? 0;
+          const total = res.thisMonthTotal ?? 0;
+          const days = res.dayCount ?? 0;
+          const useFallback = yesterday === 0 && lastRecorded > 0;
+          const amt = yesterday > 0 ? yesterday : lastRecorded;
+          const dateStr = yesterday > 0 ? res.yesterdayDate : res.lastRecordedDate;
+          const labelEl = document.getElementById('retail-yesterday-label');
+          if (labelEl) labelEl.textContent = useFallback ? 'Zadnji unesen promet' : 'Jučerašnji promet';
+          yesterdayEl.textContent = amt > 0 ? amt.toLocaleString('sr-RS') + ' €' : '—';
+          yesterdayDateEl.textContent = dateStr ? formatDateShort(dateStr) : '';
+          monthEl.textContent = total > 0 ? total.toLocaleString('sr-RS') + ' €' : '—';
+          daysEl.textContent = days > 0 ? days + ' dana' : '';
+          const prometMjesecEl = document.getElementById('promet-mjesec-line');
+          if (prometMjesecEl) prometMjesecEl.textContent = 'Promet ovog mjeseca: ' + (total > 0 ? total.toLocaleString('sr-RS') + ' €' : '—');
+        } else {
+          yesterdayEl.textContent = '—';
+          monthEl.textContent = '—';
+        }
+      } catch (_) {
+        yesterdayEl.textContent = '—';
+        monthEl.textContent = '—';
+      }
+    }
+    function formatDateShort(iso) {
+      if (!iso) return '';
+      const [y, m, d] = iso.split('-');
+      return d + '.' + m + '.' + y + '.';
+    }
+    /** Pri učitavanju stranice automatski preuzmi jučerašnji promet (koristi spremljenu šifru). */
+    async function runAutoRetailFetch() {
+      const msg = document.getElementById('retail-msg');
+      try {
+        const res = await fetchJson('/retail-fetch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+        if (res.ok) {
+          loadRetailSummary();
+          if (msg) { msg.style.display = 'block'; msg.className = 'message success'; msg.textContent = 'Ažurirano.'; setTimeout(() => { msg.style.display = 'none'; }, 3000); }
+        }
+      } catch (_) {}
+    }
+
+    document.getElementById('btn-chat-send').addEventListener('click', sendChatMessage);
+    document.getElementById('chat-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') sendChatMessage();
+    });
+    async function sendChatMessage() {
+      const input = document.getElementById('chat-input');
+      const msg = input.value.trim();
+      if (!msg) return;
+      const container = document.getElementById('chat-messages');
+      const userDiv = document.createElement('div');
+      userDiv.className = 'chat-msg user';
+      userDiv.style.marginBottom = '10px';
+      userDiv.innerHTML = '<strong>Ti:</strong> ' + msg.replace(/</g, '&lt;');
+      container.appendChild(userDiv);
+      input.value = '';
+      container.scrollTop = container.scrollHeight;
+      const btn = document.getElementById('btn-chat-send');
+      btn.disabled = true;
+      try {
+        const res = await fetchJson('/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: msg }) });
+        const botDiv = document.createElement('div');
+        botDiv.className = 'chat-msg bot';
+        botDiv.style.marginBottom = '10px';
+        botDiv.innerHTML = '<strong>Bot:</strong> ' + (res.reply || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+        container.appendChild(botDiv);
+        container.scrollTop = container.scrollHeight;
+      } catch (e) {
+        const errDiv = document.createElement('div');
+        errDiv.className = 'chat-msg bot';
+        errDiv.style.marginBottom = '10px';
+        errDiv.style.color = 'var(--sf-danger)';
+        errDiv.innerHTML = '<strong>Bot:</strong> Greška: ' + e.message;
+        container.appendChild(errDiv);
+        container.scrollTop = container.scrollHeight;
+      }
+      btn.disabled = false;
+    }
+
+    if (RUN_APP) {
+      const pieSub = document.getElementById('pie-chart-subtitle');
+      if (pieSub) pieSub.textContent = 'Pie chart raspodjela (' + new Date().toLocaleDateString('sr-RS', { month: 'long', year: 'numeric' }) + ').';
+      setTimeout(function () {
+        loadStatus();
+        loadRetailSummary();
+        runAutoRetailFetch();
+        loadTurnover();
+        loadDeclines();
+        loadBrandAnalysis();
+        loadRegionAnalysis();
+        loadRecommendations();
+      }, 2000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+node_modules/
+.env
+retail.source.json
+db.mapping.json
+data/*.db
+data/retail_downloads/
+uploads/
+output/
+*.log

@@ -1,0 +1,14 @@
+{
+  "promoHistoryPath": "./akcije",
+  "promoHistoryYear": 2025,
+  "promoHistoryPath2026": "./akcije 2026",
+  "promoHistoryYear2026": 2026,
+  "baselineDaysBeforePromo": 14,
+  "recommendationLookbackDays": 7,
+  "elasticityThresholds": {
+    "LOW": { "maxUplift": 1.2 },
+    "MEDIUM": { "minUplift": 1.2, "maxUplift": 1.6 },
+    "HIGH": { "minUplift": 1.6, "maxUplift": 2.2 },
+    "EXTREME": { "minUplift": 2.2 }
+  }
+}
